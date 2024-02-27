@@ -1,12 +1,20 @@
 import axios from "axios";
+import { getToken } from "./token";
 //根域名配置和超时时间
 const request= axios.create({
     baseURL: 'http://geek.itheima.net/v1_0',
-    timeout: 5000
+    timeout: 7000
   })
 
 // 添加请求拦截器,在请求发送之前做拦截，设置自定义参数
 request.interceptors.request.use((config)=> {
+    //操作这个config，注入token数据
+    //1.获取token
+    const token=getToken();
+    //2.按照后端的格式要求做token拼接
+    if(token){
+      config.headers.Authorization=`Bearer ${token}`
+    }
     return config
   }, (error)=> {
     return Promise.reject(error)

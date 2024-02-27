@@ -21,7 +21,7 @@ const userStore=createSlice({
 //异步方法 完成登录获取token
 const fetchLogin=(loginForm)=>{
     return async (dispatch)=>{
-        //1.发送异步请求,接收返回数据中的token
+        //1.发送异步请求,接收返回数据中的token（如果账号存在）
         const res=await request.post('/authorizations',loginForm)
         //2.提交同步action进行token的存入
         dispatch(setToken(res.data.token))
