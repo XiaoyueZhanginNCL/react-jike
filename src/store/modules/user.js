@@ -1,8 +1,8 @@
 //统一的用户状态管理
 
 import { createSlice } from "@reduxjs/toolkit";
-import {request} from '@/utils/index'
 import { getToken, setToken as _setToken ,clearToken} from '@/utils'
+import { loginAPI,getProfileAPI } from "@/apis/user";
 
 const userStore=createSlice({
     name:'user',
@@ -33,7 +33,8 @@ const {setToken,setUserInfo,clearUserInfo}=userStore.actions;
 const fetchLogin=(loginForm)=>{
     return async (dispatch)=>{
         //1.发送异步请求,接收返回数据中的token（如果账号存在）
-        const res=await request.post('/authorizations',loginForm)
+        // const res=await request.post('/authorizations',loginForm)
+        const res=await loginAPI(loginForm);
         //2.提交同步action进行token的存入
         dispatch(setToken(res.data.token))
     }
@@ -41,7 +42,8 @@ const fetchLogin=(loginForm)=>{
 
 const fetchUserInfo=()=>{
     return async (dispatch)=>{
-        const res=await request.get('/user/profile');
+        // const res=await request.get('/user/profile');
+        const res=await getProfileAPI();
         dispatch(setUserInfo(res.data));
     }
 }
