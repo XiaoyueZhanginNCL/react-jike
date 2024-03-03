@@ -14,11 +14,55 @@ import {
   import './index.scss'
   import ReactQuill from 'react-quill'
   import 'react-quill/dist/quill.snow.css'
+  import { getChannelListAPI,createArticleAPI } from '@/apis/article'
+import { useEffect, useState } from 'react'
 
   
   const { Option } = Select
   
   const Publish = () => {
+
+    const [channelList,setChannelList]=useState([]);
+    const [imageList,setImageList]=useState([]);
+    const [imageType,setImageType]=useState(0);//默认为无图类型
+
+    useEffect(()=>{
+        //获取频道列表
+        async function getChannel(){
+            const res=await getChannelListAPI();
+            setChannelList(res.data.channels);
+        }
+
+        getChannel();
+    },[])
+
+    //用户提交表单
+    function onFinish(formValue){
+        //根据接口文档的格式修正数据格式
+        const {title,content,channel_id} = formValue;
+        const reqData={
+            title,
+            content,
+            cover:{
+                type:0,
+                images:[]
+            },
+            channel_id
+        }
+        //调用发布文章接口
+        createArticleAPI(reqData);
+    }
+
+    //上传封面图片
+    function onChange(value){
+        // console.log(value);
+        setImageList(value.fileList)
+    }
+
+    //切换上传图片类型
+    function onTypeChange(event){
+        setImageType(event.target.value);
+    }
     return (
       <div className="publish">
         <Card
@@ -33,7 +77,8 @@ import {
           <Form
             labelCol={{ span: 4 }}
             wrapperCol={{ span: 16 }}
-            initialValues={{ type: 1 }}
+            initialValues={{ type: 0 }}//控制初始上传图片类型为无图
+            onFinish={onFinish}
           >
             <Form.Item
               label="标题"
@@ -48,9 +93,38 @@ import {
               rules={[{ required: true, message: '请选择文章频道' }]}
             >
               <Select placeholder="请选择文章频道" style={{ width: 400 }}>
-                <Option value={0}>推荐</Option>
+                {channelList.map(item => <Option key={item.id} value={item.id}>{item.name}</Option> )}
               </Select>
             </Form.Item>
+
+            <Form.Item label="封面">
+            <Form.Item name="type">
+              <Radio.Group onChange={onTypeChange}>
+                <Radio value={1}>单图</Radio>
+                <Radio value={3}>三图</Radio>
+                <Radio value={0}>无图</Radio>
+              </Radio.Group>
+            </Form.Item>
+            {/* listType:决定选择文件框的外观样式
+                showUploadList：控制显示上传列表
+                action:配置图片上传的接口地址
+                name:接口要求的字段名
+                onChange:在事件中拿到当前图片数据，并存储到React状态中
+             */}
+            {imageType>0 && <Upload
+              listType="picture-card"
+              showUploadList
+              action={'http://geek.itheima.net/v1_0/upload'}
+              onChange={onChange}
+              name='image'
+              maxCount={imageType}//控制最多上传文件的数量
+            >
+               <div style={{ marginTop: 8 }}>
+                 <PlusOutlined />
+               </div>
+            </Upload>}
+           </Form.Item>
+
             <Form.Item
               label="内容"
               name="content"
