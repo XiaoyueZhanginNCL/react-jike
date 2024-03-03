@@ -7,7 +7,8 @@ import {
     Input,
     Upload,
     Space,
-    Select
+    Select,
+    message
   } from 'antd'
   import { PlusOutlined } from '@ant-design/icons'
   import { Link } from 'react-router-dom'
@@ -38,19 +39,22 @@ import { useEffect, useState } from 'react'
 
     //用户提交表单
     function onFinish(formValue){
+        //校验封面类型imageType是否和实际的图片列表imageList相匹配
+        if(imageType!==imageList.length) return message.warning('封面类型和图片数量不匹配');
         //根据接口文档的格式修正数据格式
         const {title,content,channel_id} = formValue;
         const reqData={
             title,
             content,
             cover:{
-                type:0,
-                images:[]
+                type:imageType,//封面模式
+                images:imageList.map(item => item.response.data.url)//图片列表
             },
             channel_id
         }
         //调用发布文章接口
         createArticleAPI(reqData);
+        message.success('发布文章成功')
     }
 
     //上传封面图片
