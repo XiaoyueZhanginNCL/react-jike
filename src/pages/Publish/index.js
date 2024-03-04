@@ -72,7 +72,24 @@ import useChannel from '@/hooks/useChannel'
       async function getArticleDetail(){
         const res=await getArticleDetailAPI(articleId);
         //4.调用setFieldsValue方法实现数据回填
-        form.setFieldsValue(res.data);
+
+        //为什么无法实现封面回填？
+        //数据结构的问题 set方法：{type：3} 返回的数据：{cover：{type：3}}
+
+        form.setFieldsValue({
+          ...res.data,
+          type:res.data.cover.type
+        });
+
+        //回填封面列表
+        setImageType(res.data.cover.type);//否则默认是无图状态，不显示上传框
+
+        //显示图片 上传图片的接口格式需要：{url:url}
+        setImageList(res.data.cover.images.map((item)=>{
+          return {url:item}
+        }));
+        
+
       }
       getArticleDetail();
     },[articleId,form])
@@ -133,6 +150,7 @@ import useChannel from '@/hooks/useChannel'
               onChange={onChange}
               name='image'
               maxCount={imageType}//控制最多上传文件的数量
+              fileList={imageList}//当前显示的图片列表
             >
                <div style={{ marginTop: 8 }}>
                  <PlusOutlined />
