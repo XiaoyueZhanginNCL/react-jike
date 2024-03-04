@@ -15,27 +15,20 @@ import {
   import './index.scss'
   import ReactQuill from 'react-quill'
   import 'react-quill/dist/quill.snow.css'
-  import { getChannelListAPI,createArticleAPI } from '@/apis/article'
-import { useEffect, useState } from 'react'
+  import { createArticleAPI } from '@/apis/article'
+import { useState } from 'react'
+import useChannel from '@/hooks/useChannel'
 
   
   const { Option } = Select
   
   const Publish = () => {
 
-    const [channelList,setChannelList]=useState([]);
     const [imageList,setImageList]=useState([]);
     const [imageType,setImageType]=useState(0);//默认为无图类型
 
-    useEffect(()=>{
-        //获取频道列表
-        async function getChannel(){
-            const res=await getChannelListAPI();
-            setChannelList(res.data.channels);
-        }
-
-        getChannel();
-    },[])
+    //获取频道列表
+    const {channelList}=useChannel();
 
     //用户提交表单
     function onFinish(formValue){

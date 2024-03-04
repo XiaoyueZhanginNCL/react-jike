@@ -3,6 +3,10 @@ import { Card, Breadcrumb, Form, Button, Radio, DatePicker, Select } from 'antd'
 import { Table, Tag, Space } from 'antd'
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import img404 from '@/assets/error.png'
+import useChannel from '@/hooks/useChannel'
+import { useState,useEffect } from 'react'
+import { getArticleListAPI } from '@/apis/article'
+const dayjs = require('dayjs');
 
 const { Option } = Select
 const { RangePicker } = DatePicker
@@ -26,7 +30,10 @@ const Article = () => {
         {
           title: '状态',
           dataIndex: 'status',
-          render: data => <Tag color="green">审核通过</Tag>
+          //data —— 后端返回的状态status 根据它来做条件渲染
+          //data===1 待审核
+          //data===2 审核通过
+          render: data => data===1 ? <Tag color="warning">待审核</Tag> : <Tag color="success">审核通过</Tag>
         },
         {
           title: '发布时间',
@@ -62,20 +69,47 @@ const Article = () => {
         }
       ]
 
-      const data = [
-        {
-          id: '8218',
-          comment_count: 0,
-          cover: {
-            images: [],
-          },
-          like_count: 0,
-          pubdate: '2019-03-11 09:00:00',
-          read_count: 2,
-          status: 2,
-          title: 'wkwebview离线化加载h5资源解决方案'
-        }
-      ]
+  //获取频道列表
+  const {channelList} =useChannel();
+
+  //获取文章列表
+  const [list,setList]=useState([]);
+  const [count,setCount]=useState(0);
+
+  //根据条件渲染文章列表，准备参数
+  const [reqData,setReqData] =useState({
+    status:'',
+    channel_id:'',
+    begin_pubdate:'',
+    end_pubdate:'',
+    page:1,
+    per_page:4
+  })
+
+
+  useEffect(()=>{
+      async function getList(){
+          const res=await getArticleListAPI(reqData);
+          setList(res.data.results);
+          setCount(res.data.total_count);
+      }
+
+      getList();
+  },[reqData])
+  
+
+  //获取筛选数据
+  function onFinish(values){
+    setReqData({
+      ...reqData,
+      status:values.status,
+      channel_id:values.channel_id,
+      begin_pubdate:dayjs(values.date[0]).format('YYYY-MM-DD'),
+      end_pubdate:dayjs(values.date[1]).format('YYYY-MM-DD'),
+    })
+  }
+
+
 
   return (
     <div>
@@ -88,7 +122,7 @@ const Article = () => {
         }
         style={{ marginBottom: 20 }}
       >
-        <Form initialValues={{ status: '' }}>
+        <Form initialValues={{ status: '' }} onFinish={onFinish}>
           <Form.Item label="状态" name="status">
             <Radio.Group>
               <Radio value={''}>全部</Radio>
@@ -103,13 +137,11 @@ const Article = () => {
               defaultValue="lucy"
               style={{ width: 120 }}
             >
-              <Option value="jack">Jack</Option>
-              <Option value="lucy">Lucy</Option>
+              {channelList.map( item => <Option key={item.id} value={item.id}>{item.name}</Option>)}
             </Select>
           </Form.Item>
 
           <Form.Item label="日期" name="date">
-            {/* 传入locale属性 控制中文显示*/}
             <RangePicker ></RangePicker>
           </Form.Item>
 
@@ -120,9 +152,10 @@ const Article = () => {
           </Form.Item>
         </Form>
       </Card>
+
       {/* 表格区域 */}
-      <Card title={`根据筛选条件共查询到 count 条结果：`}>
-        <Table rowKey="id" columns={columns} dataSource={data} />
+      <Card title={`根据筛选条件共查询到 ${count} 条结果：`}>
+        <Table rowKey="id" columns={columns} dataSource={list} />
       </Card>
     </div>
   )
