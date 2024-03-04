@@ -1,17 +1,18 @@
-import { Link } from 'react-router-dom'
-import { Card, Breadcrumb, Form, Button, Radio, DatePicker, Select } from 'antd'
+import { Link, useNavigate } from 'react-router-dom'
+import { Card, Breadcrumb, Form, Button, Radio, DatePicker, Select,Popconfirm} from 'antd'
 import { Table, Tag, Space } from 'antd'
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import img404 from '@/assets/error.png'
 import useChannel from '@/hooks/useChannel'
 import { useState,useEffect } from 'react'
-import { getArticleListAPI } from '@/apis/article'
+import { getArticleListAPI,deleteArticleAPI } from '@/apis/article'
 const dayjs = require('dayjs');
 
 const { Option } = Select
 const { RangePicker } = DatePicker
 
 const Article = () => {
+  const navgiate=useNavigate();
 
     const columns = [
         {
@@ -56,13 +57,22 @@ const Article = () => {
           render: data => {
             return (
               <Space size="middle">
-                <Button type="primary" shape="circle" icon={<EditOutlined />} />
-                <Button
+                <Button type="primary" shape="circle" icon={<EditOutlined />} onClick={()=>{navgiate(`/publish?id=${data.id}`)}} />
+                <Popconfirm
+                  title="Delete the task"
+                  description="Are you sure to delete this task?"
+                  onConfirm={()=>{onConfirm(data)}}
+                  okText="Yes"
+                   cancelText="No">  
+
+                  <Button
                   type="primary"
                   danger
                   shape="circle"
                   icon={<DeleteOutlined />}
                 />
+
+                 </Popconfirm>
               </Space>
             )
           }
@@ -109,7 +119,23 @@ const Article = () => {
     })
   }
 
+  //分页
+  function onPageChange(value){
+    const page=value.current;
+    setReqData({
+      ...reqData,
+      page
+    })
+  }
 
+  //确认删除
+  async function onConfirm(data){
+    // console.log(data);
+    await deleteArticleAPI(data.id);//确保删除完成后在进行渲染
+    setReqData({//重新渲染列表数据
+      ...reqData
+    })
+  }
 
   return (
     <div>
@@ -155,7 +181,11 @@ const Article = () => {
 
       {/* 表格区域 */}
       <Card title={`根据筛选条件共查询到 ${count} 条结果：`}>
-        <Table rowKey="id" columns={columns} dataSource={list} />
+        <Table rowKey="id" columns={columns} dataSource={list} 
+        pagination={{//实现分页功能 页数=数据总数/每页条数
+          total:count,
+          pageSize:reqData.per_page,
+        }} onChange={onPageChange}/>
       </Card>
     </div>
   )

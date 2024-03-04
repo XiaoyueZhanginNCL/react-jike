@@ -28,3 +28,19 @@ export const getArticleListAPI=(params)=>{
         params
     })
 }
+
+//删除文章
+export const deleteArticleAPI=(id)=>{
+    return request({
+        url:`/mp/articles/${id}`,
+        method:'DELETE',
+    })
+}
+
+//获取文章详情
+export const getArticleDetailAPI=(id)=>{
+    return request({
+        url:`/mp/articles/${id}`,
+        method:'GET'
+    })
+}

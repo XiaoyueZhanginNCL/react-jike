@@ -11,12 +11,12 @@ import {
     message
   } from 'antd'
   import { PlusOutlined } from '@ant-design/icons'
-  import { Link } from 'react-router-dom'
+  import { Link, useSearchParams } from 'react-router-dom'
   import './index.scss'
   import ReactQuill from 'react-quill'
   import 'react-quill/dist/quill.snow.css'
-  import { createArticleAPI } from '@/apis/article'
-import { useState } from 'react'
+  import { createArticleAPI,getArticleDetailAPI} from '@/apis/article'
+import { useEffect, useState } from 'react'
 import useChannel from '@/hooks/useChannel'
 
   
@@ -60,6 +60,23 @@ import useChannel from '@/hooks/useChannel'
     function onTypeChange(event){
         setImageType(event.target.value);
     }
+
+    //回填数据
+    //1.获取Form实例并绑定在From组件上
+    const [form]=Form.useForm();
+    //2.拿到query参数中的id
+    const [searchParams]=useSearchParams();
+    const articleId=searchParams.get('id');
+    useEffect(()=>{
+    //3.根据id获取文章详情数据
+      async function getArticleDetail(){
+        const res=await getArticleDetailAPI(articleId);
+        //4.调用setFieldsValue方法实现数据回填
+        form.setFieldsValue(res.data);
+      }
+      getArticleDetail();
+    },[articleId,form])
+
     return (
       <div className="publish">
         <Card
@@ -76,6 +93,7 @@ import useChannel from '@/hooks/useChannel'
             wrapperCol={{ span: 16 }}
             initialValues={{ type: 0 }}//控制初始上传图片类型为无图
             onFinish={onFinish}
+            form={form}
           >
             <Form.Item
               label="标题"
