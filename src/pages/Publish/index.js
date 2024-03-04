@@ -15,7 +15,7 @@ import {
   import './index.scss'
   import ReactQuill from 'react-quill'
   import 'react-quill/dist/quill.snow.css'
-  import { createArticleAPI,getArticleDetailAPI} from '@/apis/article'
+  import { createArticleAPI,getArticleDetailAPI,updateArticleAPI} from '@/apis/article'
 import { useEffect, useState } from 'react'
 import useChannel from '@/hooks/useChannel'
 
@@ -29,37 +29,6 @@ import useChannel from '@/hooks/useChannel'
 
     //获取频道列表
     const {channelList}=useChannel();
-
-    //用户提交表单
-    function onFinish(formValue){
-        //校验封面类型imageType是否和实际的图片列表imageList相匹配
-        if(imageType!==imageList.length) return message.warning('封面类型和图片数量不匹配');
-        //根据接口文档的格式修正数据格式
-        const {title,content,channel_id} = formValue;
-        const reqData={
-            title,
-            content,
-            cover:{
-                type:imageType,//封面模式
-                images:imageList.map(item => item.response.data.url)//图片列表
-            },
-            channel_id
-        }
-        //调用发布文章接口
-        createArticleAPI(reqData);
-        message.success('发布文章成功')
-    }
-
-    //上传封面图片
-    function onChange(value){
-        // console.log(value);
-        setImageList(value.fileList)
-    }
-
-    //切换上传图片类型
-    function onTypeChange(event){
-        setImageType(event.target.value);
-    }
 
     //回填数据
     //1.获取Form实例并绑定在From组件上
@@ -91,8 +60,64 @@ import useChannel from '@/hooks/useChannel'
         
 
       }
-      getArticleDetail();
+      if(articleId){
+        getArticleDetail();
+      }
     },[articleId,form])
+
+
+    //用户提交表单
+    function onFinish(formValue){
+        //校验封面类型imageType是否和实际的图片列表imageList相匹配
+        if(imageType!==imageList.length) return message.warning('封面类型和图片数量不匹配');
+        //根据接口文档的格式修正数据格式
+        const {title,content,channel_id} = formValue;
+        const reqData={
+            title,
+            content,
+            cover:{
+                type:imageType,//封面模式
+                //这个url处理逻辑只是在新增文章时的逻辑，由于新增文章和回显时的图片路径不一样，所以需要分别处理
+                images:imageList.map(item => {
+
+                  if(item.response){ //新增文章
+                    return item.response.data.url
+                  }else{ //编辑文章
+                    return item.url;
+                  }
+
+                })//图片列表 ["url"]
+            },
+            channel_id
+        }
+
+        if(articleId){
+          //调用编辑文章接口
+          updateArticleAPI({
+            ...reqData,
+            id:articleId
+          })
+          message.success('修改文章成功')
+        }else{
+          //调用发布文章接口
+        createArticleAPI(reqData);
+        message.success('发布文章成功')
+        }
+        
+    }
+
+    //上传封面图片
+    function onChange(value){
+        console.log("ImageList",value.fileList);
+        setImageList(value.fileList)
+    }
+
+    //切换上传图片类型
+    function onTypeChange(event){
+        setImageType(event.target.value);
+    }
+
+    
 
     return (
       <div className="publish">
@@ -100,7 +125,7 @@ import useChannel from '@/hooks/useChannel'
           title={
             <Breadcrumb items={[
               { title: <Link to={'/'}>首页</Link> },
-              { title: '发布文章' },
+              { title: `${articleId ? '编辑':'发布'}文章` },
             ]}
             />
           }

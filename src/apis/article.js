@@ -20,6 +20,15 @@ export const createArticleAPI=(data)=>{
     })
 }
 
+//编辑文章
+export const updateArticleAPI=(data)=>{
+    return request({
+        url:`/mp/articles/${data.id}?draft=false`,
+        method:'PUT',
+        data
+    })
+}
+
 //获取文章列表
 export const getArticleListAPI=(params)=>{
     return request({
