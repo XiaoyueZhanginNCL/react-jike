@@ -16,17 +16,17 @@ const { Header, Sider } = Layout
 
 const items = [
   {
-    label: '首页',
+    label: 'Home',
     key: '/',
     icon: <HomeOutlined />,
   },
   {
-    label: '文章管理',
+    label: 'Article Management',
     key: '/article',
     icon: <DiffOutlined />,
   },
   {
-    label: '创建文章',
+    label: 'Create Article',
     key: '/publish',
     icon: <EditOutlined />,
   },
@@ -61,8 +61,8 @@ const GeekLayout = () => {
         <div className="user-info">
           <span className="user-name">{name}</span>
           <span className="user-logout">
-            <Popconfirm title="是否确认退出？" okText="退出" cancelText="取消" onConfirm={onConfirmExit}>
-              <LogoutOutlined /> 退出
+            <Popconfirm title="Are you sure you want to exit?" okText="Yes" cancelText="Cancel" onConfirm={onConfirmExit}>
+              <LogoutOutlined /> Exit
             </Popconfirm>
           </span>
         </div>

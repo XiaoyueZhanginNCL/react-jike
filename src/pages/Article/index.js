@@ -16,7 +16,7 @@ const Article = () => {
 
     const columns = [
         {
-          title: '封面',
+          title: 'Cover',
           dataIndex: 'cover',
           width: 120,
           render: cover => {
@@ -24,36 +24,36 @@ const Article = () => {
           }
         },
         {
-          title: '标题',
+          title: 'Title',
           dataIndex: 'title',
           width: 220
         },
         {
-          title: '状态',
+          title: 'Status',
           dataIndex: 'status',
           //data —— 后端返回的状态status 根据它来做条件渲染
           //data===1 待审核
           //data===2 审核通过
-          render: data => data===1 ? <Tag color="warning">待审核</Tag> : <Tag color="success">审核通过</Tag>
+          render: data => data===1 ? <Tag color="warning">Pending Review</Tag> : <Tag color="success">Approved</Tag>
         },
         {
-          title: '发布时间',
+          title: 'Publication Time',
           dataIndex: 'pubdate'
         },
         {
-          title: '阅读数',
+          title: 'Number of Reads',
           dataIndex: 'read_count'
         },
         {
-          title: '评论数',
+          title: 'Number of Comments',
           dataIndex: 'comment_count'
         },
         {
-          title: '点赞数',
+          title: 'Number of Likes',
           dataIndex: 'like_count'
         },
         {
-          title: '操作',
+          title: 'Action',
           render: data => {
             return (
               <Space size="middle">
@@ -143,23 +143,23 @@ const Article = () => {
         title={
           <Breadcrumb items={[
             { title: <Link to={'/'}>首页</Link> },
-            { title: '文章列表' },
+            { title: 'Article List' },
           ]} />
         }
         style={{ marginBottom: 20 }}
       >
         <Form initialValues={{ status: '' }} onFinish={onFinish}>
-          <Form.Item label="状态" name="status">
+          <Form.Item label="Status" name="status">
             <Radio.Group>
-              <Radio value={''}>全部</Radio>
-              <Radio value={0}>草稿</Radio>
-              <Radio value={2}>审核通过</Radio>
+              <Radio value={''}>All</Radio>
+              <Radio value={0}>Draft</Radio>
+              <Radio value={2}>Approved</Radio>
             </Radio.Group>
           </Form.Item>
 
-          <Form.Item label="频道" name="channel_id">
+          <Form.Item label="Channel" name="channel_id">
             <Select
-              placeholder="请选择文章频道"
+              placeholder="Please select the article channel."
               defaultValue="lucy"
               style={{ width: 120 }}
             >
@@ -167,20 +167,20 @@ const Article = () => {
             </Select>
           </Form.Item>
 
-          <Form.Item label="日期" name="date">
+          <Form.Item label="Date" name="date">
             <RangePicker ></RangePicker>
           </Form.Item>
 
           <Form.Item>
             <Button type="primary" htmlType="submit" style={{ marginLeft: 40 }}>
-              筛选
+            Filter
             </Button>
           </Form.Item>
         </Form>
       </Card>
 
       {/* 表格区域 */}
-      <Card title={`根据筛选条件共查询到 ${count} 条结果：`}>
+      <Card title={`${count} results found based on the filtering criteria.`}>
         <Table rowKey="id" columns={columns} dataSource={list} 
         pagination={{//实现分页功能 页数=数据总数/每页条数
           total:count,

@@ -69,7 +69,7 @@ import useChannel from '@/hooks/useChannel'
     //用户提交表单
     function onFinish(formValue){
         //校验封面类型imageType是否和实际的图片列表imageList相匹配
-        if(imageType!==imageList.length) return message.warning('封面类型和图片数量不匹配');
+        if(imageType!==imageList.length) return message.warning('The cover type and the number of images do not match.');
         //根据接口文档的格式修正数据格式
         const {title,content,channel_id} = formValue;
         const reqData={
@@ -97,11 +97,11 @@ import useChannel from '@/hooks/useChannel'
             ...reqData,
             id:articleId
           })
-          message.success('修改文章成功')
+          message.success('Article modification successful.')
         }else{
           //调用发布文章接口
         createArticleAPI(reqData);
-        message.success('发布文章成功')
+        message.success('Article published successfully.')
         }
         
     }
@@ -124,8 +124,8 @@ import useChannel from '@/hooks/useChannel'
         <Card
           title={
             <Breadcrumb items={[
-              { title: <Link to={'/'}>首页</Link> },
-              { title: `${articleId ? '编辑':'发布'}文章` },
+              { title: <Link to={'/'}>Home</Link> },
+              { title: `${articleId ? 'Edit':'Publish'}Article` },
             ]}
             />
           }
@@ -138,28 +138,28 @@ import useChannel from '@/hooks/useChannel'
             form={form}
           >
             <Form.Item
-              label="标题"
+              label="Title"
               name="title"
-              rules={[{ required: true, message: '请输入文章标题' }]}
+              rules={[{ required: true, message: 'Please enter the article title.' }]}
             >
-              <Input placeholder="请输入文章标题" style={{ width: 400 }} />
+              <Input placeholder="Please enter the article title." style={{ width: 400 }} />
             </Form.Item>
             <Form.Item
-              label="频道"
+              label="Channel"
               name="channel_id"
-              rules={[{ required: true, message: '请选择文章频道' }]}
+              rules={[{ required: true, message: 'Please select the article channel.' }]}
             >
-              <Select placeholder="请选择文章频道" style={{ width: 400 }}>
+              <Select placeholder="Please select the article channel." style={{ width: 400 }}>
                 {channelList.map(item => <Option key={item.id} value={item.id}>{item.name}</Option> )}
               </Select>
             </Form.Item>
 
-            <Form.Item label="封面">
+            <Form.Item label="Cover">
             <Form.Item name="type">
               <Radio.Group onChange={onTypeChange}>
-                <Radio value={1}>单图</Radio>
-                <Radio value={3}>三图</Radio>
-                <Radio value={0}>无图</Radio>
+                <Radio value={1}>Single Image</Radio>
+                <Radio value={3}>Three Images</Radio>
+                <Radio value={0}>No Image</Radio>
               </Radio.Group>
             </Form.Item>
             {/* listType:决定选择文件框的外观样式
@@ -184,21 +184,21 @@ import useChannel from '@/hooks/useChannel'
            </Form.Item>
 
             <Form.Item
-              label="内容"
+              label="Content"
               name="content"
-              rules={[{ required: true, message: '请输入文章内容' }]}
+              rules={[{ required: true, message: 'Please enter the article content.' }]}
             >
                 <ReactQuill
                   className="publish-quill"
                   theme="snow"
-                  placeholder="请输入文章内容"
+                  placeholder="Please enter the article content."
                 />
             </Form.Item>
   
             <Form.Item wrapperCol={{ offset: 4 }}>
               <Space>
                 <Button size="large" type="primary" htmlType="submit">
-                  发布文章
+                Publish Article
                 </Button>
               </Space>
             </Form.Item>
